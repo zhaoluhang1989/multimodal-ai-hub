@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         openaiKey: localStorage.getItem('openai_api_key') || '',
         apiType: localStorage.getItem('api_type') || 'free',
         currentFeature: 'image-gen',
-        imageModel: { provider: 'gemini', model: 'gemini-2.5-flash-preview-image' },
-        chatModel: { provider: 'gemini', model: 'gemini-2.5-flash' },
-        visionModel: { provider: 'gemini', model: 'gemini-2.5-flash' },
+        imageModel: { provider: 'gemini', model: 'gemini-3-pro-image-preview' },
+        chatModel: { provider: 'gemini', model: 'gemini-3-pro-preview' },
+        visionModel: { provider: 'gemini', model: 'gemini-3-pro-preview' },
         imageRatio: '1:1',
         imageCount: 1,
         chatHistory: [],
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const enhanced = await callGeminiText(
                 `你是一位专业的 AI 图像提示词工程师。请将以下简单描述优化为更专业、更详细的英文图像生成提示词，包含风格、光影、色彩、构图等细节。只返回优化后的英文提示词,不要加任何解释：\n\n${prompt}`,
-                'gemini-2.5-flash'
+                'gemini-3-flash-preview'
             );
             elements.imagePrompt.value = enhanced;
             showToast('提示词已优化', 'success');
@@ -342,14 +342,12 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < state.imageCount; i++) {
                 if (provider === 'gemini') {
                     // 根据模型选择不同的生成方法
-                    if (model === 'imagen-3.0-generate-002') {
-                        promises.push(generateImageWithImagen3(apiKey, prompt, state.imageRatio));
-                    } else if (model === 'gemini-2.5-flash-preview-image' || model === 'gemini-3-pro-image-preview') {
-                        // Nano Banana 系列
+                    if (model === 'gemini-3-pro-image-preview' || model === 'gemini-3-flash-preview') {
+                        // Nano Banana Pro 和 Gemini 3 Flash
                         promises.push(generateImageWithNanoBanana(apiKey, prompt, model));
                     } else {
-                        // 默认使用 Nano Banana
-                        promises.push(generateImageWithNanoBanana(apiKey, prompt, 'gemini-2.5-flash-preview-image'));
+                        // 默认使用 Nano Banana Pro
+                        promises.push(generateImageWithNanoBanana(apiKey, prompt, 'gemini-3-pro-image-preview'));
                     }
                 } else {
                     promises.push(generateImageWithDalle(apiKey, prompt, state.imageRatio));
