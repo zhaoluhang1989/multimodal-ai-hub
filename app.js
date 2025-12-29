@@ -10,15 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
         openaiKey: localStorage.getItem('openai_api_key') || '',
         apiType: localStorage.getItem('api_type') || 'free',
         currentFeature: 'image-gen',
-        imageModel: { provider: 'gemini', model: 'gemini-2.0-flash-exp-image-generation' },
-        chatModel: { provider: 'gemini', model: 'gemini-2.0-flash' },
-        visionModel: { provider: 'gemini', model: 'gemini-2.0-flash' },
+        imageModel: { provider: 'gemini', model: 'gemini-3-pro-image-preview' },
+        chatModel: { provider: 'gemini', model: 'gemini-3-pro-preview' },
+        visionModel: { provider: 'gemini', model: 'gemini-3-pro-preview' },
         imageRatio: '1:1',
         imageCount: 1,
         chatHistory: [],
         uploadedImage: null,
-        attachedFile: null,  // PDF/文本文件
-        attachedFileContent: null  // 文件内容
+        attachedFile: null,
+        attachedFileContent: null
     };
 
     // ========== DOM 元素 ==========
