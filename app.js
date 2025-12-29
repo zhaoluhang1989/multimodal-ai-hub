@@ -976,7 +976,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========== 通用工具函数 ==========
-    async function callGeminiText(prompt, model = 'gemini-1.5-flash') {
+    async function callGeminiText(prompt, model = 'gemini-3-flash-preview') {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${state.geminiKey}`;
 
         const response = await fetch(url, {
