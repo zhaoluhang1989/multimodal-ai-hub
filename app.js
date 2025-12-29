@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
         openaiKey: localStorage.getItem('openai_api_key') || '',
         apiType: localStorage.getItem('api_type') || 'free',
         currentFeature: 'image-gen',
-        imageModel: { provider: 'gemini', model: 'gemini-3-pro-image-preview' },
-        chatModel: { provider: 'gemini', model: 'gemini-3-pro-preview' },
-        visionModel: { provider: 'gemini', model: 'gemini-3-pro-preview' },
+        imageModel: { provider: 'gemini', model: 'gemini-2.0-flash-exp-image-generation' },
+        chatModel: { provider: 'gemini', model: 'gemini-2.0-flash' },
+        visionModel: { provider: 'gemini', model: 'gemini-2.0-flash' },
         imageRatio: '1:1',
         imageCount: 1,
         chatHistory: [],
@@ -378,12 +378,12 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < state.imageCount; i++) {
                 if (provider === 'gemini') {
                     // 根据模型选择不同的生成方法
-                    if (model === 'gemini-3-pro-image-preview' || model === 'gemini-3-flash-preview') {
-                        // Nano Banana Pro 和 Gemini 3 Flash
-                        promises.push(generateImageWithNanoBanana(apiKey, prompt, model));
+                    if (model === 'imagen-3.0-generate-002') {
+                        // Imagen 3 使用专门的 API
+                        promises.push(generateImageWithImagen3(apiKey, prompt, state.imageRatio));
                     } else {
-                        // 默认使用 Nano Banana Pro
-                        promises.push(generateImageWithNanoBanana(apiKey, prompt, 'gemini-3-pro-image-preview'));
+                        // Gemini 2.0 Flash 和其他模型使用统一的生成方法
+                        promises.push(generateImageWithGeminiFlash(apiKey, prompt, model));
                     }
                 } else {
                     promises.push(generateImageWithDalle(apiKey, prompt, state.imageRatio));
@@ -459,8 +459,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Gemini 2.0 Flash (Nano Banana) 多模态生成 - 已替换为最新 Nano Banana
-    async function generateImageWithNanoBanana(apiKey, prompt, model) {
+    // Gemini 2.0 Flash 图像生成
+    async function generateImageWithGeminiFlash(apiKey, prompt, model) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
         const body = {
