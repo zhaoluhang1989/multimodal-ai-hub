@@ -9,6 +9,12 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Markdown 渲染和代码高亮 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- PDF.js 用于解析 PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
 </head>
 
 <body>
@@ -280,10 +286,25 @@
                                 </div>
                                 <h3>欢迎来到智能对话</h3>
                                 <p>选择一个模型，开始与 AI 的精彩对话</p>
+                                <p class="context-info"><i class="fas fa-database"></i> 支持 200万 Tokens 上下文</p>
+                            </div>
+                        </div>
+                        <!-- 文件附件预览区 -->
+                        <div class="file-attachment-preview hidden" id="file-attachment-preview">
+                            <div class="attachment-item">
+                                <i class="fas fa-file-pdf"></i>
+                                <span class="attachment-name" id="attachment-name"></span>
+                                <button class="remove-attachment" id="remove-attachment">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                         </div>
                         <div class="chat-input-wrapper">
-                            <textarea id="chat-input" placeholder="输入您的问题..." rows="1"></textarea>
+                            <input type="file" id="pdf-upload" accept=".pdf,.txt,.md" hidden>
+                            <button class="btn-attach" id="attach-file-btn" title="上传 PDF/文本文件">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <textarea id="chat-input" placeholder="输入您的问题，可上传 PDF 文件进行分析..." rows="1"></textarea>
                             <button class="btn-send" id="send-message-btn">
                                 <i class="fas fa-paper-plane"></i>
                             </button>

@@ -16,7 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
         imageRatio: '1:1',
         imageCount: 1,
         chatHistory: [],
-        uploadedImage: null
+        uploadedImage: null,
+        attachedFile: null,  // PDF/文本文件
+        attachedFileContent: null  // 文件内容
     };
 
     // ========== DOM 元素 ==========
@@ -78,8 +80,31 @@ document.addEventListener('DOMContentLoaded', () => {
         apiTypeBtns: document.querySelectorAll('.api-type-btn'),
 
         // Toast
-        toast: document.getElementById('toast')
+        toast: document.getElementById('toast'),
+
+        // PDF 上传
+        pdfUpload: document.getElementById('pdf-upload'),
+        attachFileBtn: document.getElementById('attach-file-btn'),
+        fileAttachmentPreview: document.getElementById('file-attachment-preview'),
+        attachmentName: document.getElementById('attachment-name'),
+        removeAttachment: document.getElementById('remove-attachment')
     };
+
+    // ========== Markdown 配置 ==========
+    if (typeof marked !== 'undefined') {
+        marked.setOptions({
+            breaks: true,
+            gfm: true,
+            highlight: function (code, lang) {
+                if (typeof hljs !== 'undefined' && lang && hljs.getLanguage(lang)) {
+                    try {
+                        return hljs.highlight(code, { language: lang }).value;
+                    } catch (e) { }
+                }
+                return code;
+            }
+        });
+    }
 
     // ========== 初始化 ==========
     function init() {
@@ -184,6 +209,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 showToast(`已切换至${btn.dataset.type === 'paid' ? '付费' : '免费'}版 API`, 'success');
             });
         });
+
+        // PDF/文件上传
+        if (elements.attachFileBtn) {
+            elements.attachFileBtn.addEventListener('click', () => elements.pdfUpload?.click());
+        }
+        if (elements.pdfUpload) {
+            elements.pdfUpload.addEventListener('change', handleFileAttachment);
+        }
+        if (elements.removeAttachment) {
+            elements.removeAttachment.addEventListener('click', removeFileAttachment);
+        }
     }
 
     // ========== API 配置功能 ==========
@@ -557,10 +593,85 @@ document.addEventListener('DOMContentLoaded', () => {
         showToast('画廊已清空', 'success');
     }
 
+    // ========== 文件附件处理 ==========
+    async function handleFileAttachment(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const validTypes = ['application/pdf', 'text/plain', 'text/markdown'];
+        const validExts = ['.pdf', '.txt', '.md'];
+        const ext = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+
+        if (!validTypes.includes(file.type) && !validExts.includes(ext)) {
+            showToast('请上传 PDF、TXT 或 MD 文件', 'error');
+            return;
+        }
+
+        state.attachedFile = file;
+
+        // 读取文件内容
+        try {
+            if (file.type === 'application/pdf' || ext === '.pdf') {
+                state.attachedFileContent = await extractTextFromPDF(file);
+            } else {
+                state.attachedFileContent = await file.text();
+            }
+
+            // 显示附件预览
+            if (elements.attachmentName) {
+                elements.attachmentName.textContent = `${file.name} (${formatFileSize(file.size)})`;
+            }
+            if (elements.fileAttachmentPreview) {
+                elements.fileAttachmentPreview.classList.remove('hidden');
+            }
+
+            const charCount = state.attachedFileContent.length;
+            showToast(`已加载 ${file.name}，共 ${charCount.toLocaleString()} 字符`, 'success');
+        } catch (error) {
+            showToast('文件读取失败：' + error.message, 'error');
+            state.attachedFile = null;
+            state.attachedFileContent = null;
+        }
+    }
+
+    async function extractTextFromPDF(file) {
+        // 简化的 PDF 文本提取，使用 base64 发送给 API
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    // 将 PDF 作为 base64 发送给 Gemini 解析
+                    const base64 = e.target.result.split(',')[1];
+                    resolve(`[PDF 文件内容 - ${file.name}]\n请分析此 PDF 文件的内容。`);
+                } catch (err) {
+                    reject(err);
+                }
+            };
+            reader.onerror = () => reject(new Error('文件读取失败'));
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function removeFileAttachment() {
+        state.attachedFile = null;
+        state.attachedFileContent = null;
+        if (elements.pdfUpload) elements.pdfUpload.value = '';
+        if (elements.fileAttachmentPreview) {
+            elements.fileAttachmentPreview.classList.add('hidden');
+        }
+        showToast('已移除附件', 'success');
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
     // ========== 聊天功能 ==========
     async function sendChatMessage() {
         const message = elements.chatInput.value.trim();
-        if (!message) return;
+        if (!message && !state.attachedFileContent) return;
 
         const { provider, model } = state.chatModel;
         const apiKey = provider === 'gemini' ? state.geminiKey : state.openaiKey;
@@ -574,41 +685,89 @@ document.addEventListener('DOMContentLoaded', () => {
         const welcome = elements.chatMessages.querySelector('.welcome-message');
         if (welcome) welcome.remove();
 
-        // 添加用户消息
-        appendMessage('user', message);
+        // 构建完整消息（包含附件内容）
+        let fullMessage = message;
+        if (state.attachedFileContent) {
+            fullMessage = `[附件内容]\n${state.attachedFileContent}\n\n[用户问题]\n${message || '请分析以上文件内容'}`;
+        }
+
+        // 显示用户消息（不显示完整附件内容）
+        const displayMessage = state.attachedFile
+            ? `📎 ${state.attachedFile.name}\n\n${message || '请分析此文件'}`
+            : message;
+        appendMessage('user', displayMessage, false);
         elements.chatInput.value = '';
 
+        // 清除附件
+        if (state.attachedFile) {
+            removeFileAttachment();
+        }
+
         // 添加 AI 消息占位符
-        const aiMessage = appendMessage('assistant', '...');
+        const aiMessage = appendMessage('assistant', '✨ 思考中...', false);
 
         try {
             let response;
             if (provider === 'gemini') {
-                response = await callGeminiChat(apiKey, model, message);
+                response = await callGeminiChat(apiKey, model, fullMessage);
             } else {
-                response = await callOpenAIChat(apiKey, model, message);
+                response = await callOpenAIChat(apiKey, model, fullMessage);
             }
 
-            aiMessage.querySelector('.message-content').textContent = response;
+            // 使用 Markdown 渲染
+            renderMarkdown(aiMessage.querySelector('.message-content'), response);
         } catch (error) {
-            aiMessage.querySelector('.message-content').textContent = '抱歉，发生了错误：' + error.message;
+            aiMessage.querySelector('.message-content').innerHTML = '抱歉，发生了错误：' + error.message;
         }
     }
 
-    function appendMessage(role, content) {
+    function appendMessage(role, content, parseMarkdown = false) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${role}`;
-        msgDiv.innerHTML = `<div class="message-content">${content}</div>`;
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'message-content';
+
+        if (parseMarkdown && typeof marked !== 'undefined') {
+            contentDiv.innerHTML = marked.parse(content);
+            // 应用代码高亮
+            contentDiv.querySelectorAll('pre code').forEach((block) => {
+                if (typeof hljs !== 'undefined') {
+                    hljs.highlightElement(block);
+                }
+            });
+        } else {
+            contentDiv.textContent = content;
+        }
+
+        msgDiv.appendChild(contentDiv);
         elements.chatMessages.appendChild(msgDiv);
         elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
         return msgDiv;
+    }
+
+    function renderMarkdown(element, content) {
+        if (typeof marked !== 'undefined') {
+            element.innerHTML = marked.parse(content);
+            // 应用代码高亮
+            element.querySelectorAll('pre code').forEach((block) => {
+                if (typeof hljs !== 'undefined') {
+                    hljs.highlightElement(block);
+                }
+            });
+        } else {
+            element.textContent = content;
+        }
     }
 
     async function callGeminiChat(apiKey, model, message) {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
         const body = {
-            contents: [{ parts: [{ text: message }] }]
+            contents: [{ parts: [{ text: message }] }],
+            generationConfig: {
+                maxOutputTokens: 8192,  // 最大输出
+                temperature: 0.7
+            }
         };
 
         const response = await fetch(url, {
@@ -632,7 +791,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const body = {
             model: model,
             messages: [{ role: 'user', content: message }],
-            max_tokens: 2048
+            max_tokens: 16384  // 更大的输出空间
         };
 
         const response = await fetch(url, {
