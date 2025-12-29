@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 创想工坊 | 多模态智能创作平台</title>
+    <meta name="description" content="集成 Gemini、OpenAI 等顶级 AI 模型的多模态创作平台，支持文本生成、图像创作、视觉理解等多种能力。">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- 顶部导航 -->
+        <nav class="top-nav">
+            <div class="nav-brand">
+                <div class="brand-logo">
+                    <i class="fas fa-atom"></i>
+                </div>
+                <span class="brand-name">AI 创想工坊</span>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" id="settings-btn" title="设置">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 英雄区域 -->
+            <header class="hero-section">
+                <div class="hero-glow"></div>
+                <h1 class="hero-title">
+                    <span class="gradient-text">多模态 AI</span>
+                    <span class="white-text">创作平台</span>
+                </h1>
+                <p class="hero-subtitle">
+                    一站式调用 Gemini、OpenAI 等顶级模型的文本生成、图像创作与视觉理解能力
+                </p>
+            </header>
+
+            <!-- API 配置面板 -->
+            <section class="config-panel glass-card" id="config-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fas fa-key"></i>
+                        <span>API 密钥配置</span>
+                    </div>
+                    <button class="toggle-btn" id="toggle-config">
+                        <i class="fas fa-chevron-up"></i>
+                    </button>
+                </div>
+                <div class="panel-content" id="config-content">
+                    <div class="api-grid">
+                        <div class="api-item">
+                            <div class="api-brand gemini">
+                                <i class="fas fa-gem"></i>
+                                <span>Google Gemini</span>
+                            </div>
+                            <input type="password" id="gemini-key" placeholder="输入 Gemini API Key..." class="api-input">
+                            <div class="api-status" id="gemini-status">
+                                <span class="status-dot"></span>
+                                <span class="status-text">未配置</span>
+                            </div>
+                        </div>
+                        <div class="api-item">
+                            <div class="api-brand openai">
+                                <i class="fas fa-robot"></i>
+                                <span>OpenAI</span>
+                            </div>
+                            <input type="password" id="openai-key" placeholder="输入 OpenAI API Key..." class="api-input">
+                            <div class="api-status" id="openai-status">
+                                <span class="status-dot"></span>
+                                <span class="status-text">未配置</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="config-actions">
+                        <button class="btn-secondary" id="save-keys">
+                            <i class="fas fa-save"></i>
+                            <span>保存密钥</span>
+                        </button>
+                        <button class="btn-secondary" id="clear-keys">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>清除</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 功能选择区 -->
+            <section class="feature-tabs">
+                <button class="feature-tab active" data-feature="image-gen">
+                    <div class="tab-icon">
+                        <i class="fas fa-image"></i>
+                    </div>
+                    <div class="tab-content">
+                        <span class="tab-title">图像生成</span>
+                        <span class="tab-desc">Nano Banana / DALL·E</span>
+                    </div>
+                </button>
+                <button class="feature-tab" data-feature="chat">
+                    <div class="tab-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="tab-content">
+                        <span class="tab-title">智能对话</span>
+                        <span class="tab-desc">Gemini / GPT 系列</span>
+                    </div>
+                </button>
+                <button class="feature-tab" data-feature="vision">
+                    <div class="tab-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="tab-content">
+                        <span class="tab-title">视觉理解</span>
+                        <span class="tab-desc">图像识别与分析</span>
+                    </div>
+                </button>
+            </section>
+
+            <!-- 图像生成面板 -->
+            <section class="workspace-panel glass-card" id="image-gen-panel">
+                <div class="workspace-header">
+                    <h2 class="workspace-title">
+                        <span class="title-icon"><i class="fas fa-wand-magic-sparkles"></i></span>
+                        图像创作工坊
+                    </h2>
+                </div>
+
+                <div class="workspace-content">
+                    <!-- 模型选择 -->
+                    <div class="option-group">
+                        <label class="option-label">选择模型</label>
+                        <div class="model-cards" id="image-model-selector">
+                            <div class="model-card active" data-provider="gemini"
+                                data-model="gemini-2.5-flash-preview-image">
+                                <div class="model-badge gemini-badge">Nano Banana</div>
+                                <div class="model-name">2.5 Flash</div>
+                                <div class="model-desc">快速图像生成</div>
+                            </div>
+                            <div class="model-card" data-provider="gemini" data-model="gemini-3-pro-image-preview">
+                                <div class="model-badge gemini-badge">Nano Banana Pro</div>
+                                <div class="model-name">3.0 Pro</div>
+                                <div class="model-desc">专业级 4K 生成</div>
+                            </div>
+                            <div class="model-card" data-provider="gemini" data-model="imagen-3.0-generate-002">
+                                <div class="model-badge gemini-badge">Gemini</div>
+                                <div class="model-name">Imagen 3</div>
+                                <div class="model-desc">高质量图像生成</div>
+                            </div>
+                            <div class="model-card" data-provider="openai" data-model="dall-e-3">
+                                <div class="model-badge openai-badge">OpenAI</div>
+                                <div class="model-name">DALL·E 3</div>
+                                <div class="model-desc">创意图像生成</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 参数设置 -->
+                    <div class="params-grid">
+                        <div class="param-item">
+                            <label class="option-label">画幅比例</label>
+                            <div class="ratio-selector" id="ratio-selector">
+                                <button class="ratio-btn active" data-ratio="1:1">
+                                    <div class="ratio-icon square"></div>
+                                    <span>1:1</span>
+                                </button>
+                                <button class="ratio-btn" data-ratio="16:9">
+                                    <div class="ratio-icon wide"></div>
+                                    <span>16:9</span>
+                                </button>
+                                <button class="ratio-btn" data-ratio="9:16">
+                                    <div class="ratio-icon tall"></div>
+                                    <span>9:16</span>
+                                </button>
+                                <button class="ratio-btn" data-ratio="4:3">
+                                    <div class="ratio-icon standard"></div>
+                                    <span>4:3</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="param-item">
+                            <label class="option-label">生成数量</label>
+                            <div class="quantity-control">
+                                <button class="qty-btn" id="qty-minus">−</button>
+                                <input type="number" id="image-count" value="1" min="1" max="8" readonly>
+                                <button class="qty-btn" id="qty-plus">+</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 提示词输入 -->
+                    <div class="prompt-section">
+                        <label class="option-label">创意描述</label>
+                        <div class="prompt-wrapper">
+                            <textarea id="image-prompt"
+                                placeholder="描述你想要生成的图像...&#10;&#10;例如：一只穿着宇航服的猫咪漂浮在太空中，背景是绚丽的星云，电影级光效，8K超清画质"></textarea>
+                            <div class="prompt-actions">
+                                <button class="prompt-action-btn" id="enhance-prompt" title="AI优化提示词">
+                                    <i class="fas fa-magic"></i>
+                                </button>
+                                <button class="prompt-action-btn" id="clear-prompt" title="清空">
+                                    <i class="fas fa-eraser"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 生成按钮 -->
+                    <div class="generate-section">
+                        <div class="status-display" id="image-status">
+                            <div class="status-indicator">
+                                <span class="pulse"></span>
+                            </div>
+                            <span class="status-message">准备就绪</span>
+                        </div>
+                        <button class="btn-generate" id="generate-image-btn">
+                            <span class="btn-text">开始创作</span>
+                            <span class="btn-icon"><i class="fas fa-sparkles"></i></span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 图片展示区 -->
+                <div class="gallery-section" id="image-gallery">
+                    <div class="gallery-header">
+                        <h3 class="gallery-title">创作成果</h3>
+                        <button class="btn-icon-only" id="clear-gallery" title="清空画廊">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="gallery-grid" id="gallery-grid">
+                        <!-- 生成的图片将显示在这里 -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 智能对话面板 -->
+            <section class="workspace-panel glass-card hidden" id="chat-panel">
+                <div class="workspace-header">
+                    <h2 class="workspace-title">
+                        <span class="title-icon"><i class="fas fa-brain"></i></span>
+                        智能对话助手
+                    </h2>
+                </div>
+
+                <div class="workspace-content">
+                    <!-- 模型选择 -->
+                    <div class="option-group">
+                        <label class="option-label">选择模型</label>
+                        <div class="model-cards" id="chat-model-selector">
+                            <div class="model-card active" data-provider="gemini" data-model="gemini-2.5-flash">
+                                <div class="model-badge gemini-badge">Gemini</div>
+                                <div class="model-name">2.5 Flash</div>
+                                <div class="model-desc">快速响应</div>
+                            </div>
+                            <div class="model-card" data-provider="gemini" data-model="gemini-2.5-pro">
+                                <div class="model-badge gemini-badge">Gemini</div>
+                                <div class="model-name">2.5 Pro</div>
+                                <div class="model-desc">专业能力</div>
+                            </div>
+                            <div class="model-card" data-provider="gemini" data-model="gemini-3-flash-preview">
+                                <div class="model-badge gemini-badge">Gemini 3</div>
+                                <div class="model-name">3.0 Flash</div>
+                                <div class="model-desc">最新预览</div>
+                            </div>
+                            <div class="model-card" data-provider="openai" data-model="gpt-4.1">
+                                <div class="model-badge openai-badge">OpenAI</div>
+                                <div class="model-name">GPT-4.1</div>
+                                <div class="model-desc">最新旗舰</div>
+                            </div>
+                            <div class="model-card" data-provider="openai" data-model="gpt-4o">
+                                <div class="model-badge openai-badge">OpenAI</div>
+                                <div class="model-name">GPT-4o</div>
+                                <div class="model-desc">多模态</div>
+                            </div>
+                            <div class="model-card" data-provider="openai" data-model="o3-mini">
+                                <div class="model-badge openai-badge">OpenAI</div>
+                                <div class="model-name">o3-mini</div>
+                                <div class="model-desc">推理模型</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 对话区域 -->
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="welcome-message">
+                                <div class="welcome-icon">
+                                    <i class="fas fa-robot"></i>
+                                </div>
+                                <h3>欢迎来到智能对话</h3>
+                                <p>选择一个模型，开始与 AI 的精彩对话</p>
+                            </div>
+                        </div>
+                        <div class="chat-input-wrapper">
+                            <textarea id="chat-input" placeholder="输入您的问题..." rows="1"></textarea>
+                            <button class="btn-send" id="send-message-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 视觉理解面板 -->
+            <section class="workspace-panel glass-card hidden" id="vision-panel">
+                <div class="workspace-header">
+                    <h2 class="workspace-title">
+                        <span class="title-icon"><i class="fas fa-camera-retro"></i></span>
+                        视觉理解工坊
+                    </h2>
+                </div>
+
+                <div class="workspace-content">
+                    <!-- 模型选择 -->
+                    <div class="option-group">
+                        <label class="option-label">选择模型</label>
+                        <div class="model-cards" id="vision-model-selector">
+                            <div class="model-card active" data-provider="gemini" data-model="gemini-2.5-flash">
+                                <div class="model-badge gemini-badge">Gemini</div>
+                                <div class="model-name">2.5 Flash</div>
+                                <div class="model-desc">多模态理解</div>
+                            </div>
+                            <div class="model-card" data-provider="gemini" data-model="gemini-2.5-pro">
+                                <div class="model-badge gemini-badge">Gemini</div>
+                                <div class="model-name">2.5 Pro</div>
+                                <div class="model-desc">专业分析</div>
+                            </div>
+                            <div class="model-card" data-provider="openai" data-model="gpt-4.1">
+                                <div class="model-badge openai-badge">OpenAI</div>
+                                <div class="model-name">GPT-4.1</div>
+                                <div class="model-desc">视觉分析</div>
+                            </div>
+                            <div class="model-card" data-provider="openai" data-model="gpt-4o">
+                                <div class="model-badge openai-badge">OpenAI</div>
+                                <div class="model-name">GPT-4o</div>
+                                <div class="model-desc">多模态</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 图片上传区 -->
+                    <div class="upload-section">
+                        <label class="option-label">上传图片</label>
+                        <div class="upload-zone" id="upload-zone">
+                            <input type="file" id="vision-image" accept="image/*" hidden>
+                            <div class="upload-placeholder" id="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>点击或拖拽图片到此处</p>
+                                <span>支持 JPG、PNG、WEBP 格式</span>
+                            </div>
+                            <div class="upload-preview hidden" id="upload-preview">
+                                <img id="preview-image" alt="预览">
+                                <button class="remove-image" id="remove-image">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 问题输入 -->
+                    <div class="prompt-section">
+                        <label class="option-label">提问</label>
+                        <div class="prompt-wrapper">
+                            <textarea id="vision-prompt"
+                                placeholder="关于这张图片，你想了解什么？&#10;&#10;例如：请详细描述这张图片的内容"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- 分析按钮 -->
+                    <div class="generate-section">
+                        <div class="status-display" id="vision-status">
+                            <div class="status-indicator">
+                                <span class="pulse"></span>
+                            </div>
+                            <span class="status-message">准备就绪</span>
+                        </div>
+                        <button class="btn-generate" id="analyze-image-btn">
+                            <span class="btn-text">开始分析</span>
+                            <span class="btn-icon"><i class="fas fa-search"></i></span>
+                        </button>
+                    </div>
+
+                    <!-- 分析结果 -->
+                    <div class="result-section hidden" id="vision-result">
+                        <h3 class="result-title">分析结果</h3>
+                        <div class="result-content" id="vision-result-content"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 底部信息 -->
+        <footer class="app-footer">
+            <p>Powered by Gemini & OpenAI | 多模态 AI 创作平台</p>
+        </footer>
+    </div>
+
+    <!-- 设置弹窗 -->
+    <div class="modal-overlay hidden" id="settings-modal">
+        <div class="modal-content glass-card">
+            <div class="modal-header">
+                <h3><i class="fas fa-cog"></i> 高级设置</h3>
+                <button class="modal-close" id="close-settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label class="setting-label">主题模式</label>
+                    <div class="theme-switcher">
+                        <button class="theme-btn active" data-theme="dark">深色</button>
+                        <button class="theme-btn" data-theme="light">浅色</button>
+                    </div>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">Gemini API 类型</label>
+                    <div class="api-type-switcher">
+                        <button class="api-type-btn active" data-type="free">免费版</button>
+                        <button class="api-type-btn" data-type="paid">付费版</button>
+                    </div>
+                    <p class="setting-hint">付费版可使用 Pro 4K 等高级功能</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span class="toast-message">操作成功</span>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
