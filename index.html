@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 创想工坊 | 多模态智能创作平台</title>
     <meta name="description" content="集成 Gemini、OpenAI 等顶级 AI 模型的多模态创作平台，支持文本生成、图像创作、视觉理解等多种能力。">
-    <link rel="stylesheet" href="style.css?v=3.0">
+    <link rel="stylesheet" href="style.css?v=4.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <!-- Markdown 渲染和代码高亮 -->
@@ -142,16 +142,10 @@
                     <div class="option-group">
                         <label class="option-label">选择模型</label>
                         <div class="model-cards" id="image-model-selector">
-                            <div class="model-card active" data-provider="gemini"
-                                data-model="gemini-3-pro-image-preview">
-                                <div class="model-badge gemini-badge">Gemini 3</div>
-                                <div class="model-name">Pro Image</div>
-                                <div class="model-desc">专业级图像</div>
-                            </div>
-                            <div class="model-card" data-provider="gemini" data-model="gemini-3-flash-preview">
+                            <div class="model-card active" data-provider="gemini" data-model="gemini-3-flash-preview">
                                 <div class="model-badge gemini-badge">Gemini 3</div>
                                 <div class="model-name">Flash</div>
-                                <div class="model-desc">快速生成</div>
+                                <div class="model-desc">图像生成</div>
                             </div>
                             <div class="model-card" data-provider="openai" data-model="dall-e-3">
                                 <div class="model-badge openai-badge">OpenAI</div>
@@ -254,15 +248,10 @@
                     <div class="option-group">
                         <label class="option-label">选择模型</label>
                         <div class="model-cards" id="chat-model-selector">
-                            <div class="model-card active" data-provider="gemini" data-model="gemini-3-pro-preview">
-                                <div class="model-badge gemini-badge">Gemini 3</div>
-                                <div class="model-name">Pro</div>
-                                <div class="model-desc">最强推理</div>
-                            </div>
-                            <div class="model-card" data-provider="gemini" data-model="gemini-3-flash-preview">
+                            <div class="model-card active" data-provider="gemini" data-model="gemini-3-flash-preview">
                                 <div class="model-badge gemini-badge">Gemini 3</div>
                                 <div class="model-name">Flash</div>
-                                <div class="model-desc">快速响应</div>
+                                <div class="model-desc">智能对话</div>
                             </div>
                             <div class="model-card" data-provider="openai" data-model="gpt-4o">
                                 <div class="model-badge openai-badge">OpenAI</div>
@@ -322,15 +311,10 @@
                     <div class="option-group">
                         <label class="option-label">选择模型</label>
                         <div class="model-cards" id="vision-model-selector">
-                            <div class="model-card active" data-provider="gemini" data-model="gemini-3-pro-preview">
-                                <div class="model-badge gemini-badge">Gemini 3</div>
-                                <div class="model-name">Pro</div>
-                                <div class="model-desc">多模态理解</div>
-                            </div>
-                            <div class="model-card" data-provider="gemini" data-model="gemini-3-flash-preview">
+                            <div class="model-card active" data-provider="gemini" data-model="gemini-3-flash-preview">
                                 <div class="model-badge gemini-badge">Gemini 3</div>
                                 <div class="model-name">Flash</div>
-                                <div class="model-desc">快速分析</div>
+                                <div class="model-desc">视觉理解</div>
                             </div>
                             <div class="model-card" data-provider="openai" data-model="gpt-4o">
                                 <div class="model-badge openai-badge">OpenAI</div>
